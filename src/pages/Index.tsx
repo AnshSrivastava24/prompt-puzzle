@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
 interface Message {
   id: string;

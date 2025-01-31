@@ -79,12 +79,27 @@ const Index = () => {
     setIsLoading(true);
 
     try {
-      // Simulate AI response - Replace with actual model integration
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Replace this with your local model API call
+      const response = await fetch('http://localhost:8000/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: content,
+          model: selectedModel
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from model');
+      }
+
+      const data = await response.json();
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: `This is a simulated response using ${selectedModel}. Replace this with actual model integration.`,
+        content: data.response,
         isBot: true,
       };
 
@@ -119,20 +134,22 @@ const Index = () => {
         {currentChat ? (
           <>
             <ScrollArea className="flex-1">
-              {currentChat.messages.map((message) => (
-                <ChatMessage
-                  key={message.id}
-                  content={message.content}
-                  isBot={message.isBot}
-                />
-              ))}
-              {isLoading && (
-                <ChatMessage
-                  content=""
-                  isBot={true}
-                  isLoading={true}
-                />
-              )}
+              <div className="flex flex-col">
+                {currentChat.messages.map((message) => (
+                  <ChatMessage
+                    key={message.id}
+                    content={message.content}
+                    isBot={message.isBot}
+                  />
+                ))}
+                {isLoading && (
+                  <ChatMessage
+                    content=""
+                    isBot={true}
+                    isLoading={true}
+                  />
+                )}
+              </div>
             </ScrollArea>
             <ChatInput onSend={handleSendMessage} disabled={isLoading} />
           </>

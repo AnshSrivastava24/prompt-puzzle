@@ -5,6 +5,7 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { useOllama } from "@/hooks/useOllama";
 
 interface Message {
   id: string;
@@ -25,7 +26,8 @@ const Index = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState("gpt-3.5-turbo");
+  const [selectedModel, setSelectedModel] = useState("llama2");
+  const { sendPrompt } = useOllama();
 
   const currentChat = chats.find((chat) => chat.id === currentChatId);
 
@@ -79,27 +81,11 @@ const Index = () => {
     setIsLoading(true);
 
     try {
-      // Replace this with your local model API call
-      const response = await fetch('http://localhost:8000/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: content,
-          model: selectedModel
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response from model');
-      }
-
-      const data = await response.json();
+      const response = await sendPrompt(content, selectedModel);
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: response,
         isBot: true,
       };
 

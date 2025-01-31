@@ -15,6 +15,8 @@ interface Message {
 interface Chat {
   id: string;
   title: string;
+  model: string;
+  description: string;
   messages: Message[];
 }
 
@@ -23,6 +25,7 @@ const Index = () => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("gpt-3.5-turbo");
 
   const currentChat = chats.find((chat) => chat.id === currentChatId);
 
@@ -30,10 +33,23 @@ const Index = () => {
     const newChat: Chat = {
       id: Date.now().toString(),
       title: "New Chat",
+      model: selectedModel,
+      description: "Start a new conversation...",
       messages: [],
     };
     setChats([...chats, newChat]);
     setCurrentChatId(newChat.id);
+  };
+
+  const handleDeleteChat = (chatId: string) => {
+    setChats(chats.filter((chat) => chat.id !== chatId));
+    if (currentChatId === chatId) {
+      setCurrentChatId(null);
+    }
+    toast({
+      title: "Chat deleted",
+      description: "The chat has been permanently deleted.",
+    });
   };
 
   const handleSendMessage = async (content: string) => {
@@ -45,14 +61,21 @@ const Index = () => {
       isBot: false,
     };
 
-    // Add user message
-    setChats(chats.map((chat) =>
-      chat.id === currentChatId
-        ? { ...chat, messages: [...chat.messages, newMessage] }
-        : chat
-    ));
+    // Update chat title and description based on first message
+    const updatedChats = chats.map((chat) => {
+      if (chat.id === currentChatId) {
+        const updatedMessages = [...chat.messages, newMessage];
+        return {
+          ...chat,
+          title: updatedMessages.length === 1 ? content.slice(0, 30) + "..." : chat.title,
+          description: updatedMessages.length === 1 ? content : chat.description,
+          messages: updatedMessages,
+        };
+      }
+      return chat;
+    });
 
-    // Show loading state
+    setChats(updatedChats);
     setIsLoading(true);
 
     try {
@@ -61,11 +84,11 @@ const Index = () => {
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "This is a simulated response. Replace this with actual model integration.",
+        content: `This is a simulated response using ${selectedModel}. Replace this with actual model integration.`,
         isBot: true,
       };
 
-      setChats(chats.map((chat) =>
+      setChats(chats => chats.map((chat) =>
         chat.id === currentChatId
           ? { ...chat, messages: [...chat.messages, newMessage, botMessage] }
           : chat
@@ -87,6 +110,9 @@ const Index = () => {
         savedChats={chats}
         onChatSelect={setCurrentChatId}
         onNewChat={handleNewChat}
+        onDeleteChat={handleDeleteChat}
+        selectedModel={selectedModel}
+        onModelChange={setSelectedModel}
       />
       
       <main className="flex-1 flex flex-col">

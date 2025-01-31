@@ -46,14 +46,13 @@ const Sidebar = ({
       {!isCollapsed && (
         <div className="p-4 border-b border-gray-700">
           <Select value={selectedModel} onValueChange={onModelChange}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-gray-800 text-white border-gray-700">
               <SelectValue placeholder="Select Model" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-              <SelectItem value="gpt-4">GPT-4</SelectItem>
-              <SelectItem value="llama2">Llama 2</SelectItem>
-              <SelectItem value="mistral">Mistral</SelectItem>
+              <SelectItem value="jarvis">Jarvis</SelectItem>
+              <SelectItem value="llama3.1">Llama 3.1</SelectItem>
+              <SelectItem value="deepseek-r1">DeepSeek R1</SelectItem>
             </SelectContent>
           </Select>
         </div>
